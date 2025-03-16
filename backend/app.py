@@ -3,12 +3,13 @@ from flask_cors import CORS
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from google.cloud import logging, bigquery
-import os
+from sklearn.ensemble import IsolationForest
 import pickle
 from google.cloud import storage
 import pandas as pd
 
 from src.gcp_data import fetch_iam_activity_logs, fetch_roles
+from sample_data.data import RISK_ALERTS, ACCESS_LOGS
 
 app = Flask(__name__)
 CORS(app, origins=["*", "http://localhost:3000", "http://127.0.0.1:3000"])
@@ -57,6 +58,7 @@ def get_risk_alerts():
             "permission": entry.payload.get("permission"),
             "timestamp": entry.timestamp,
         })
+    return jsonify(RISK_ALERTS)
     return jsonify(logs)
 
 # Load the model from GCP
@@ -67,20 +69,41 @@ def load_model_from_gcp():
     return model
 
 # Fetch predictions from the model
-def detect_anomalies(data):
-    model = load_model_from_gcp()
-    predictions = model.predict(data[["permission_count"]])
-    data["anomaly"] = predictions
-    return data[data["anomaly"] == -1]  # Return only anomalies
+# def detect_anomalies(data):
+#     model = load_model_from_gcp()
+#     predictions = model.predict(data[["permission_count"]])
+#     data["anomaly"] = predictions
+#     return data[data["anomaly"] == -1]  # Return only anomalies
+
+# Anomaly detection function
+def detect_anomalies(logs):
+    # Convert logs to a DataFrame
+    df = pd.DataFrame(logs)
+    
+    # Feature engineering
+    df["permission_count"] = df.groupby("user")["permission"].transform("count")
+    df["risk_level"] = df["permission"].apply(lambda x: 1 if "delete" in x else 0)  # High-risk permissions
+    df["hour"] = pd.to_datetime(df["timestamp"]).dt.hour  # Extract hour from timestamp
+    
+    # Train an Isolation Forest model
+    model = IsolationForest(contamination=0.3)  # 30% of data is considered anomalous
+    df["anomaly"] = model.fit_predict(df[["permission_count", "risk_level", "hour"]])
+    
+    # Filter anomalies (anomaly == -1)
+    anomalies = df[df["anomaly"] == -1].to_dict(orient="records")
+    return anomalies
 
 # API endpoint for anomaly detection
 @app.route('/detect-anomalies', methods=['GET'])
 def get_anomalies():
-    logs = fetch_iam_activity_logs(credentials, logging_client)
-    data = pd.DataFrame(logs)
-    data["permission_count"] = data.groupby("user")["permission"].transform("count")
+    # logs = fetch_iam_activity_logs(credentials, logging_client)
+    # logs = ACCESS_LOGS
+    # data = pd.DataFrame(logs)
+    data = ACCESS_LOGS
+    # data["permission_count"] = data.groupby("user")["permission"].transform("count")
     anomalies = detect_anomalies(data)
+    return jsonify(anomalies)
     return jsonify(anomalies.to_dict(orient="records"))
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0', port=5100)
