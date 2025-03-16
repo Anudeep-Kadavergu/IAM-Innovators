@@ -88,7 +88,7 @@ const Dashboard = () => {
         </Col>
         <Col span={8}>
           <Card title="Cost Savings" bordered={false}>
-            $10,000
+          €10,000
           </Card>
         </Col>
       </Row>
