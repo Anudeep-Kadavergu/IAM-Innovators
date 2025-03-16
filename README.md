@@ -136,3 +136,6 @@ Creating Roles
                 --description="Another custom role" \
                 --permissions=compute.instances.get,compute.instances.list
 
+
+
+PPT: https://docs.google.com/presentation/d/1KxUEVBypbE04nBdfsOThnoZ39ryZWX3skrAd6Yi_GIk/edit#slide=id.p1
