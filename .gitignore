@@ -1,3 +1,4 @@
 keys/service-account-key.json
+backend/keys/service-account-key.json
 
 *.pyc
