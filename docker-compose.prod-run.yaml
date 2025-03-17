@@ -1,14 +1,14 @@
 services:
-  client:
+  frontend:
     image: asia-south1-docker.pkg.dev/ltc-hack-prj-21/iam-innovators/frontend:latest
     ports:
       - 80:3000
     networks:
       - ts-network
     environment:
-      - API_URL=http://35.188.50.151:81/
-      - REACT_APP_API_URL=http://35.188.50.151:81/
-  server:
+      - API_URL=http://34.93.150.192:81/
+      - REACT_APP_API_URL=http://34.93.150.192:81/
+  backend:
     image: asia-south1-docker.pkg.dev/ltc-hack-prj-21/iam-innovators/backend:latest
     ports:
       - 81:5400

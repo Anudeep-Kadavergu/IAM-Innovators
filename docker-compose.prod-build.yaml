@@ -1,16 +1,16 @@
 services:
-  client:
+  frontend:
     image: asia-south1-docker.pkg.dev/ltc-hack-prj-21/iam-innovators/frontend:latest
     build:
       dockerfile: Dockerfile
-      context: ./backend
+      context: ./frontend
     networks:
       - ts-network
-  server:
+  backend:
     image: asia-south1-docker.pkg.dev/ltc-hack-prj-21/iam-innovators/backend:latest
     build:
       dockerfile: Dockerfile
-      context: ./frontend
+      context: ./backend
     networks:
       - ts-network
 
