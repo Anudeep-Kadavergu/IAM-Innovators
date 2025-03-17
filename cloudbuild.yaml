@@ -16,8 +16,8 @@ steps:
       sh cicd/cloudbuild.sh || exit $?
     
 images:
-  - 'asia-south1-docker.pkg.dev/lbg-cloudathon-iam-innovators/iam-innovators/frontend:latest'
-  - 'asia-south1-docker.pkg.dev/lbg-cloudathon-iam-innovators/iam-innovators/backend:latest'
+  - 'asia-south1-docker.pkg.dev/ltc-hack-prj-21/iam-innovators/frontend:latest'
+  - 'asia-south1-docker.pkg.dev/ltc-hack-prj-21/iam-innovators/backend:latest'
 
 options:
   logging: CLOUD_LOGGING_ONLY
