@@ -6,7 +6,8 @@ import {
   AlertOutlined,
   HistoryOutlined,
   BarChartOutlined,
-  WarningOutlined
+  WarningOutlined,
+  SolutionOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
@@ -24,6 +25,11 @@ const Navbar = () => {
       key: 'roles',
       icon: <SafetyOutlined />,
       label: 'Role Viewer',
+    },
+    {
+      key: 'role_suggestion',
+      icon: <SolutionOutlined />,
+      label: 'Role Suggestion',
     },
     {
       key: 'alerts',
@@ -57,6 +63,9 @@ const Navbar = () => {
       case 'roles':
         navigate('/roles');
         break;
+      case 'role_suggestion':
+        navigate('/suggest-roles');
+        break;
       case 'alerts':
         navigate('/alerts');
         break;
@@ -68,7 +77,7 @@ const Navbar = () => {
         break;
       case 'anomalies':
         navigate('/anomalies');
-      break;
+        break;
       default:
         navigate('/');
     }

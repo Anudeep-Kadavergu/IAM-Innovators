@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
@@ -23,6 +23,49 @@ iam_service = build("iam", "v1", credentials=credentials)  # Initialize IAM serv
 logging_client = logging.Client(credentials=credentials)
 bigquery_client = bigquery.Client(credentials=credentials)
 storage_client = storage.Client(credentials=credentials)
+# Sample role database (replace with actual role data from GCP)
+ROLES_DATABASE = {
+    "read-only": "roles/viewer",
+    "write-access": "roles/editor",
+    "admin-access": "roles/owner",
+    "storage-access": "roles/storage.admin",
+    "compute-access": "roles/compute.admin",
+}
+
+# API endpoint for role suggestion
+@app.route('/suggest-roles', methods=['POST'])
+def suggest_roles():
+    user_input = request.json.get('requirement', '').lower()
+    suggested_roles = []
+
+    # Match user input with roles in the database
+    for keyword, role in ROLES_DATABASE.items():
+        if keyword in user_input:
+            suggested_roles.append(role)
+
+    return jsonify({"suggested_roles": suggested_roles})
+
+# API endpoint to assign a role to a user
+@app.route('/assign-role', methods=['POST'])
+def assign_role():
+    project_id = credentials.project_id
+    user_email = request.json.get('user_email')
+    role = request.json.get('role')
+
+    if not user_email or not role:
+        return jsonify({"error": "User email and role are required"}), 400
+
+    # Assign the role to the user in GCP
+    try:
+        policy = iam_service.get_iam_policy(request={"resource": "projects/YOUR_PROJECT_ID"})
+        policy.bindings.append({
+            "role": role,
+            "members": [f"user:{user_email}"],
+        })
+        iam_service.set_iam_policy(request={"resource": f"projects/{project_id}", "policy": policy})
+        return jsonify({"message": f"Role {role} assigned to {user_email} successfully"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # Fetch IAM roles and permissions
 @app.route('/roles', methods=['GET'])

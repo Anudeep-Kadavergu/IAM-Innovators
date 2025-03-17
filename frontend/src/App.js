@@ -7,14 +7,17 @@ import RoleViewer from './components/RoleViewer';
 import RiskAlerts from './components/RiskAlerts';
 import AuditLogs from './components/AuditLogs';
 import Reports from './components/Reports';
+import RoleSuggestion from './components/RoleSuggestion';
 import Anomalies from './components/Anomalies';
 import ApiContext from './ApiContext'; // Import the context
 import './styles.css';
 
 const { Content } = Layout;
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://127.0.0.1:5400/';
+
 const App = () => {
-  const apiUrl = "http://127.0.0.1:5100"; // Set your backend base API URL here
+  const apiUrl = API_URL; // Set your backend base API URL here
 
   return (
     <ApiContext.Provider value={apiUrl}>
@@ -25,10 +28,12 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/roles" element={<RoleViewer />} />
+              <Route path="/suggest-roles" element={<RoleSuggestion />} />
               <Route path="/alerts" element={<RiskAlerts />} />
               <Route path="/logs" element={<AuditLogs />} />
               <Route path="/reports" element={<Reports />} />
               <Route path="/anomalies" element={<Anomalies />} />
+              
             </Routes>
           </Content>
         </Layout>

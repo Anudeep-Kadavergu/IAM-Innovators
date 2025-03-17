@@ -1,9 +1,9 @@
-flask==2.3.2
+flask
 flask-cors
-google-api-python-client==2.85.0
-google-auth==2.18.0
-google-cloud-logging==3.5.0
-google-cloud-bigquery==3.10.0
+google-api-python-client
+google-auth
+google-cloud-logging
+google-cloud-bigquery
 google-auth-oauthlib 
 google-auth-httplib2 
 google-cloud-storage

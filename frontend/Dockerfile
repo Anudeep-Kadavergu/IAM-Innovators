@@ -1,13 +1,26 @@
-FROM node:23.10.0
-RUN npm install -g npm@10.9.2
+FROM node:18.12-alpine3.17 AS build
+RUN npm install -g npm@9.8.1
 WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
+COPY package.json package-lock.json ./
+RUN npm install --omit=dev
 
-# Install dependencies
-RUN npm install
+COPY . .
+RUN npm run build
+
+FROM node:18.12-alpine3.17
+
+# run using node server
+WORKDIR /app
+
+COPY --from=build /app/build ./build
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 
 EXPOSE 3000
 
-ENTRYPOINT [ "npm", "start" ]
+RUN npm install -g serve
+
+# ENTRYPOINT [ "serve", "-s", "build" ]
+ENTRYPOINT ["/entrypoint.sh"]
